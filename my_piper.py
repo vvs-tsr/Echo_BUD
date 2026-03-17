@@ -8,22 +8,23 @@ import os
 import time
 
 VOICES_DIR = "voices"
-VOICE_MODEL_NAME = "en_US-trump-high.onnx"          # ← your requested voice
+DEFAULT_VOICE = "en_US-eminem-medium.onnx"
 
-_piper_voice = None  # Global singleton
+_piper_voice = None       # cached voice object
+_loaded_model_path = None # which model is currently loaded
 
 
-def get_piper_voice(
-    model_path: str = os.path.join(VOICES_DIR, VOICE_MODEL_NAME)
-) -> PiperVoice | None:
+def get_piper_voice(model_name: str = DEFAULT_VOICE) -> PiperVoice | None:
     """
-    Lazy-load the Piper voice model (only once).
-    Returns None + prints error if model is missing or fails to load.
+    Load (or reload) a Piper voice by filename.
+    Re-loads automatically when a different voice is requested.
     """
-    global _piper_voice
+    global _piper_voice, _loaded_model_path
 
-    if _piper_voice is not None:
-        return _piper_voice
+    model_path = os.path.join(VOICES_DIR, model_name)
+
+    if _piper_voice is not None and _loaded_model_path == model_path:
+        return _piper_voice  # already loaded, same model
 
     if not os.path.exists(model_path):
         print(f"ERROR: Piper voice model not found at {model_path}")
@@ -34,20 +35,23 @@ def get_piper_voice(
     print(f"Loading Piper TTS voice: {model_path} ...")
     try:
         _piper_voice = PiperVoice.load(model_path)
+        _loaded_model_path = model_path
         print("Piper TTS model loaded successfully.")
     except Exception as e:
         print(f"Error loading Piper TTS model: {e}")
         _piper_voice = None
+        _loaded_model_path = None
 
     return _piper_voice
 
 
-def generate_tts_wav(text: str, output_filepath: str) -> bool:
+def generate_tts_wav(text: str, output_filepath: str, model_name: str = DEFAULT_VOICE) -> bool:
     """
     Convert text → WAV file using Piper.
+    Pass model_name to use a specific voice (filename only, e.g. 'en_US-trump-high.onnx').
     Returns True if file was written successfully.
     """
-    voice = get_piper_voice()
+    voice = get_piper_voice(model_name)
     if voice is None:
         print("TTS model not loaded → cannot generate audio.")
         return False
