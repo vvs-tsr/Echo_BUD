@@ -1,4 +1,4 @@
-# Echo BUD — LLM Chat UI with MQTT Control
+# Echo BUD -LLM Chat UI with MQTT Control
 
 A local AI assistant (Jarvis) powered by Groq that can control smart home devices via MQTT and speak responses using Piper TTS.
 
@@ -47,5 +47,5 @@ python llm_ui.py
 
 ## Environment Variables
 See `.env.example` for all required variables:
-- `GROQ_API_KEY` — from console.groq.com
-- `MQTT_BROKER`, `MQTT_PORT`, `MQTT_USERNAME`, `MQTT_PASSWORD` — HiveMQ Cloud credentials
+- `GROQ_API_KEY` -from console.groq.com
+- `MQTT_BROKER`, `MQTT_PORT`, `MQTT_USERNAME`, `MQTT_PASSWORD` -HiveMQ Cloud credentials
